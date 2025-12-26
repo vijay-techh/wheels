@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+
+<h2>Employee Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<h3>My Leads</h3>
+<ul id="leads"></ul>
+
+<script>
+const token = localStorage.getItem("token");
+if (!token) location.href = "login.html";
+
+async function loadLeads() {
+  const res = await fetch("http://localhost:5000/employee/leads", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const data = await res.json();
+  leads.innerHTML = "";
+
+  data.forEach(l => {
+    const li = document.createElement("li");
+    li.innerText = `${l.client_name} (${l.status})`;
+    leads.appendChild(li);
+  });
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  location.href = "login.html";
+}
+
+loadLeads();
+</script>
+
+</body>
+</html>

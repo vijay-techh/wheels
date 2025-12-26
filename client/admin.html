@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    ul { list-style: none; padding: 0; }
+    li {
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<h3>Employees</h3>
+<ul id="employees"></ul>
+
+<script>
+const token = localStorage.getItem("token");
+if (!token) location.href = "login.html";
+
+async function loadEmployees() {
+  const res = await fetch("http://localhost:5000/admin/employees", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const data = await res.json();
+  employees.innerHTML = "";
+
+  data.forEach(emp => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span>${emp.username}</span>
+      <button onclick="view(${emp.id})">View</button>
+    `;
+    employees.appendChild(li);
+  });
+}
+
+function view(id) {
+  location.href = `employee-details.html?id=${id}`;
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  location.href = "login.html";
+}
+
+loadEmployees();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Details</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    ul { padding-left: 20px; }
+    input { padding: 5px; }
+    button { margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+<h2 id="name"></h2>
+<button onclick="back()">⬅ Back</button>
+
+<h3>Leads</h3>
+<ul id="leads"></ul>
+
+<h3>Reset Password</h3>
+<input type="password" id="newpass" placeholder="New password">
+<button onclick="reset()">Update</button>
+
+<script>
+const token = localStorage.getItem("token");
+if (!token) location.href = "login.html";
+
+const id = new URLSearchParams(location.search).get("id");
+
+async function loadDetails() {
+  const res = await fetch(`http://localhost:5000/admin/employee/${id}`, {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const data = await res.json();
+  name.innerText = data.employee.username;
+
+  leads.innerHTML = "";
+  data.leads.forEach(l => {
+    const li = document.createElement("li");
+    li.innerText = `${l.client_name} (${l.status})`;
+    leads.appendChild(li);
+  });
+}
+
+async function reset() {
+  await fetch(`http://localhost:5000/admin/employee/${id}/password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({ password: newpass.value })
+  });
+
+  alert("Password updated");
+  newpass.value = "";
+}
+
+function back() {
+  location.href = "admin.html";
+}
+
+loadDetails();
+</script>
+
+</body>
+</html>
